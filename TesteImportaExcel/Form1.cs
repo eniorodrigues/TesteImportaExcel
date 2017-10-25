@@ -12,6 +12,7 @@ using System.Data.SqlClient;
 using System.Data.Common;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
+using System.Data.Sql;
 
 namespace TesteImportaExcel
 {
@@ -26,13 +27,12 @@ namespace TesteImportaExcel
         public static string excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + path + ";Extended Properties=Excel 12.0;";
         string[] files;
         string conexao;
-        string usuario;
-        string senha;
+        string baseDeDados;
 
         private void button1_Click(object sender, EventArgs e)
         {
 
-            label2.Text = "Importando sheet";
+            label2.Text = "Importando...";
 
             Excel.Application app = new Excel.Application();
             app.Workbooks.Add("");
@@ -51,12 +51,9 @@ namespace TesteImportaExcel
                     for (int j = 1; j <= app.Workbooks[i].Worksheets.Count; j++)
                 {
                         
-                     // Excel.Worksheet ws = app.Workbooks[i].Worksheets[j];
                      label2.Text = "Importando arquivo " + element + " da sheet " + app.Workbooks[i].Worksheets[j].name;
                     string myString = (app.Workbooks[i].Worksheets[j].Cells[1, 1]).Value2.ToString();
                     
-                     //ws.Copy(app.Workbooks[1].Worksheets[1]);
-
                     using (OleDbConnection connection =
                            new OleDbConnection(excelConnectionString))
                     {
@@ -70,11 +67,12 @@ namespace TesteImportaExcel
                         //Create DbDataReader to Data Worksheet
                     using (DbDataReader dr = command.ExecuteReader())
                         {
-                            // SQL Server Connection String
-                            string sqlConnectionString = "Data Source=BRCAENRODRIGUES\\msSQLEXPRESS;Initial Catalog=TESTE_2016;Integrated Security=True";
+                                // SQL Server Connection String
+                                string sqlConnectionString = "Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True";
 
-                            // Bulk Copy to SQL Server
-                            using (SqlBulkCopy bulkCopy =
+
+                                // Bulk Copy to SQL Server
+                                using (SqlBulkCopy bulkCopy =
                                        new SqlBulkCopy(sqlConnectionString))
                             {
                                 bulkCopy.DestinationTableName = "Custos_Totais";
@@ -131,7 +129,47 @@ namespace TesteImportaExcel
 
         private void button3_Click(object sender, EventArgs e)
         {
+            comboBoxBase.Items.Clear();
+            conexao = comboBoxConexao.Text;
 
+            using (var con = new SqlConnection("Data Source="+ conexao+ "; Integrated Security=True;"))
+            {
+                con.Open();
+                DataTable databases = con.GetSchema("Databases");
+
+                foreach (DataRow database in databases.Rows)
+                {
+                    String databaseName = database.Field<String>("database_name");
+                     comboBoxBase.Items.Add(databaseName);
+                }
+            }
+        }
+
+        private void txtConexao_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            string myServer = Environment.MachineName;
+
+            DataTable servers = SqlDataSourceEnumerator.Instance.GetDataSources();
+            for (int i = 0; i < servers.Rows.Count; i++)
+            {
+                if (myServer == servers.Rows[i]["ServerName"].ToString())
+                {
+                    if ((servers.Rows[i]["InstanceName"] as string) != null)
+                        comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"] + "\\" + servers.Rows[i]["InstanceName"]);
+                    else
+                        comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"]);
+                }
+            }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            baseDeDados = comboBoxBase.SelectedItem.ToString();
         }
     }
 }

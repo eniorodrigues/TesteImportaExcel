@@ -171,24 +171,25 @@ namespace TesteImportaExcel
         private void button4_Click(object sender, EventArgs e)
         {
             baseDeDados = comboBoxBase.SelectedItem.ToString();
-            tabela = textBox3.ToString();
+            tabela = textBox3.Text;
 
 
 
 
-            using (var con = new SqlConnection("Data Source=" + conexao + "; Integrated Security=True;"))
-            { 
+            using (var con = new SqlConnection("Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True"))
+            {
+
                 con.Open();
                 DataTable databases = con.GetSchema("Databases");
-                SqlCeCommand
+             
 
-                    sqlCeCommand
-
-                string sql = "create table " + Resultado + "("
+                string sql = "create table " + tabela + "("
                                  + "Nome nvarchar (60) not null, "
                                  + "Sobrenome nvarchar (80), "
                                  + "URL nvarchar (150) )";
-                cmd = new SqlCeCommand(sql, cn);
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Tabela " + tabela + " adicionada com sucesso!");
             }
 
         }

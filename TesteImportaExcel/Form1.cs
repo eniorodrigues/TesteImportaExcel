@@ -28,6 +28,7 @@ namespace TesteImportaExcel
         string[] files;
         string conexao;
         string baseDeDados;
+        string tabela;
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -170,6 +171,26 @@ namespace TesteImportaExcel
         private void button4_Click(object sender, EventArgs e)
         {
             baseDeDados = comboBoxBase.SelectedItem.ToString();
+            tabela = textBox3.ToString();
+
+
+
+
+            using (var con = new SqlConnection("Data Source=" + conexao + "; Integrated Security=True;"))
+            { 
+                con.Open();
+                DataTable databases = con.GetSchema("Databases");
+                SqlCeCommand
+
+                    sqlCeCommand
+
+                string sql = "create table " + Resultado + "("
+                                 + "Nome nvarchar (60) not null, "
+                                 + "Sobrenome nvarchar (80), "
+                                 + "URL nvarchar (150) )";
+                cmd = new SqlCeCommand(sql, cn);
+            }
+
         }
     }
 }

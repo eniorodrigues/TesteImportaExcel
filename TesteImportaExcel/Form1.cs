@@ -16,9 +16,9 @@ using System.Data.Sql;
 
 namespace TesteImportaExcel
 {
-    public partial class Form1 : Form
+    public partial class testeBtn : Form
     {
-        public Form1()
+        public testeBtn()
         {
             InitializeComponent();
         }
@@ -29,6 +29,9 @@ namespace TesteImportaExcel
         string conexao;
         string baseDeDados;
         string tabela;
+        string caminho;
+
+        List<string> colunas = new List<string>();
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -40,9 +43,8 @@ namespace TesteImportaExcel
 
             foreach (string element in files)
             {
-                System.Console.WriteLine(element);
- 
-            app.Workbooks.Add(@"C:\Users\enrodrigues\Desktop\4 - Custos - Materiais\" + element);
+
+            app.Workbooks.Add(@caminho);
  
             for (int i = 2; i <= app.Workbooks.Count; i++)
             {
@@ -53,8 +55,7 @@ namespace TesteImportaExcel
                 {
                         
                      label2.Text = "Importando arquivo " + element + " da sheet " + app.Workbooks[i].Worksheets[j].name;
-                    string myString = (app.Workbooks[i].Worksheets[j].Cells[1, 1]).Value2.ToString();
-                    
+
                     using (OleDbConnection connection =
                            new OleDbConnection(excelConnectionString))
                     {
@@ -76,15 +77,13 @@ namespace TesteImportaExcel
                                 using (SqlBulkCopy bulkCopy =
                                        new SqlBulkCopy(sqlConnectionString))
                             {
-                                bulkCopy.DestinationTableName = "Custos_Totais";
+                                bulkCopy.DestinationTableName = tabela;
                                 bulkCopy.WriteToServer(dr);
                                
                             }
                         }
-
+                            connection.Close();
                     }
-
-                 
 
                 }
 
@@ -93,6 +92,7 @@ namespace TesteImportaExcel
              
             }
             MessageBox.Show("Importação realizada com sucesso");
+            
         }
        
         private void button2_Click(object sender, EventArgs e)
@@ -115,6 +115,7 @@ namespace TesteImportaExcel
                     {
                         using (myStream)
                         {
+                            caminho = (openFileDialog1.FileName);
                             files = (openFileDialog1.SafeFileNames);
                             foreach (string file in files)
                                 listBox1.Items.Add(file);
@@ -130,20 +131,7 @@ namespace TesteImportaExcel
 
         private void button3_Click(object sender, EventArgs e)
         {
-            comboBoxBase.Items.Clear();
-            conexao = comboBoxConexao.Text;
 
-            using (var con = new SqlConnection("Data Source="+ conexao+ "; Integrated Security=True;"))
-            {
-                con.Open();
-                DataTable databases = con.GetSchema("Databases");
-
-                foreach (DataRow database in databases.Rows)
-                {
-                    String databaseName = database.Field<String>("database_name");
-                     comboBoxBase.Items.Add(databaseName);
-                }
-            }
         }
 
         private void txtConexao_TextChanged(object sender, EventArgs e)
@@ -152,6 +140,83 @@ namespace TesteImportaExcel
         }
 
         private void Form1_Load(object sender, EventArgs e)
+        {
+      
+        }
+     
+        private void button4_Click(object sender, EventArgs e)
+        {
+            baseDeDados = comboBoxBase.SelectedItem.ToString();
+            tabela = textBox3.Text;
+
+            using (var con = new SqlConnection("Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True"))
+            {
+                con.Open();
+                DataTable databases = con.GetSchema("Databases");
+                string sql = "create table " + tabela + " (";
+
+                StringBuilder campos = new StringBuilder();
+
+                for (int i = 0; i < colunas.Count; i++)
+                {
+                MessageBox.Show(colunas[i].ToString());
+
+                    campos.Append("[" + colunas[i].ToString() + "] varchar (255), ");
+
+                }
+                campos.Append("[Sheet] varchar (255), [Arquivo] varchar(255) )");
+                sql = sql + campos.ToString();
+                MessageBox.Show(sql);
+            
+
+                SqlCommand cmd = new SqlCommand(sql, con);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Tabela " + tabela + " adicionada com sucesso!");
+                con.Close();
+            }
+
+        }
+
+        private void comboBoxConexao_SelectedIndexChanged(object sender, EventArgs e)
+        {
+             comboBoxBase.Items.Clear();
+             conexao = comboBoxConexao.Text;
+
+            using (var con = new SqlConnection("Data Source=" + conexao + "; Integrated Security=True;"))
+            {
+                con.Open();
+                DataTable databases = con.GetSchema("Databases");
+
+                foreach (DataRow database in databases.Rows)
+                {
+                    String databaseName = database.Field<String>("database_name");
+                    comboBoxBase.Items.Add(databaseName);
+                }
+            }
+        }
+
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+            label2.Text = caminho;
+
+            Excel.Application app = new Excel.Application();
+            app.Workbooks.Add("");
+           
+                    app.Workbooks.Add(@caminho);
+
+                         for (int k = 1; k <= app.Workbooks[2].Worksheets[1].UsedRange.Columns.Count; k++)
+                        {
+                        
+                            string coluna = app.Workbooks[2].Worksheets[1].Cells[1, k].Value2.ToString();
+                            colunas.Add(coluna);
+                            listBox2.Items.Add(coluna);
+                       
+                        }
+
+        }
+
+        private void comboBoxConexao_Enter(object sender, EventArgs e)
         {
             string myServer = Environment.MachineName;
 
@@ -166,32 +231,12 @@ namespace TesteImportaExcel
                         comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"]);
                 }
             }
+
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private void comboBoxBase_SelectedIndexChanged(object sender, EventArgs e)
         {
             baseDeDados = comboBoxBase.SelectedItem.ToString();
-            tabela = textBox3.Text;
-
-
-
-
-            using (var con = new SqlConnection("Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True"))
-            {
-
-                con.Open();
-                DataTable databases = con.GetSchema("Databases");
-             
-
-                string sql = "create table " + tabela + "("
-                                 + "Nome nvarchar (60) not null, "
-                                 + "Sobrenome nvarchar (80), "
-                                 + "URL nvarchar (150) )";
-                SqlCommand cmd = new SqlCommand(sql, con);
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Tabela " + tabela + " adicionada com sucesso!");
-            }
-
         }
     }
 }

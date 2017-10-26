@@ -1,6 +1,6 @@
 ﻿namespace TesteImportaExcel
 {
-    partial class Form1
+    partial class testeBtn
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnImportarSQL = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -39,20 +39,22 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
             this.comboBoxConexao = new System.Windows.Forms.ComboBox();
             this.button4 = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
+            this.listBox2 = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
-            // button1
+            // btnImportarSQL
             // 
-            this.button1.Location = new System.Drawing.Point(15, 306);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(159, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Importar para SQL";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.btnImportarSQL.Location = new System.Drawing.Point(15, 208);
+            this.btnImportarSQL.Name = "btnImportarSQL";
+            this.btnImportarSQL.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.btnImportarSQL.Size = new System.Drawing.Size(159, 23);
+            this.btnImportarSQL.TabIndex = 0;
+            this.btnImportarSQL.Text = "Importar para SQL";
+            this.btnImportarSQL.UseVisualStyleBackColor = true;
+            this.btnImportarSQL.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
@@ -83,7 +85,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(15, 348);
+            this.progressBar1.Location = new System.Drawing.Point(15, 250);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(344, 23);
             this.progressBar1.TabIndex = 5;
@@ -91,7 +93,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 332);
+            this.label2.Location = new System.Drawing.Point(15, 234);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 6;
@@ -100,7 +102,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(209, 90);
+            this.label5.Location = new System.Drawing.Point(209, 52);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(80, 13);
             this.label5.TabIndex = 10;
@@ -109,14 +111,15 @@
             // comboBoxBase
             // 
             this.comboBoxBase.FormattingEnabled = true;
-            this.comboBoxBase.Location = new System.Drawing.Point(212, 106);
+            this.comboBoxBase.Location = new System.Drawing.Point(212, 68);
             this.comboBoxBase.Name = "comboBoxBase";
             this.comboBoxBase.Size = new System.Drawing.Size(197, 21);
             this.comboBoxBase.TabIndex = 11;
+            this.comboBoxBase.SelectedIndexChanged += new System.EventHandler(this.comboBoxBase_SelectedIndexChanged);
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(212, 146);
+            this.textBox3.Location = new System.Drawing.Point(212, 108);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(197, 20);
             this.textBox3.TabIndex = 12;
@@ -124,7 +127,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(209, 130);
+            this.label6.Location = new System.Drawing.Point(209, 92);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(89, 13);
             this.label6.TabIndex = 13;
@@ -139,16 +142,6 @@
             this.label7.TabIndex = 15;
             this.label7.Text = "Conexão:";
             // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(212, 52);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 16;
-            this.button3.Text = "Conectar";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
-            // 
             // comboBoxConexao
             // 
             this.comboBoxConexao.FormattingEnabled = true;
@@ -156,10 +149,13 @@
             this.comboBoxConexao.Name = "comboBoxConexao";
             this.comboBoxConexao.Size = new System.Drawing.Size(197, 21);
             this.comboBoxConexao.TabIndex = 17;
+            this.comboBoxConexao.Text = "Selecione a conexão";
+            this.comboBoxConexao.SelectedIndexChanged += new System.EventHandler(this.comboBoxConexao_SelectedIndexChanged);
+            this.comboBoxConexao.Enter += new System.EventHandler(this.comboBoxConexao_Enter);
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(212, 178);
+            this.button4.Location = new System.Drawing.Point(212, 134);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(75, 23);
             this.button4.TabIndex = 18;
@@ -167,14 +163,33 @@
             this.button4.UseVisualStyleBackColor = true;
             this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
-            // Form1
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(448, 25);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(116, 23);
+            this.button3.TabIndex = 19;
+            this.button3.Text = "Colunas da Tabela";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            // 
+            // listBox2
+            // 
+            this.listBox2.FormattingEnabled = true;
+            this.listBox2.Location = new System.Drawing.Point(448, 54);
+            this.listBox2.Name = "listBox2";
+            this.listBox2.Size = new System.Drawing.Size(191, 134);
+            this.listBox2.TabIndex = 20;
+            // 
+            // testeBtn
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(491, 383);
+            this.ClientSize = new System.Drawing.Size(761, 287);
+            this.Controls.Add(this.listBox2);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.comboBoxConexao);
-            this.Controls.Add(this.button3);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.textBox3);
@@ -185,9 +200,9 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Name = "Form1";
-            this.Text = "Form1";
+            this.Controls.Add(this.btnImportarSQL);
+            this.Name = "testeBtn";
+            this.Text = "Importa Excel";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -196,7 +211,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnImportarSQL;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label1;
@@ -207,9 +222,10 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ComboBox comboBoxConexao;
         private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.ListBox listBox2;
     }
 }
 

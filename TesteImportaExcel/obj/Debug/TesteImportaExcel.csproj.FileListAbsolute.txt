@@ -1,5 +1,3 @@
-c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.csprojResolveAssemblyReference.cache
-c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.Form1.resources
 c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.Properties.Resources.resources
 c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.csproj.GenerateResource.Cache
 c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.csproj.CoreCompileInputs.cache
@@ -10,3 +8,5 @@ c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\bin\Debug\
 c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\bin\Debug\EPPlus.xml
 c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.exe
 c:\users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.pdb
+C:\Users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.testeBtn.resources
+C:\Users\enrodrigues\source\repos\TesteImportaExcel\TesteImportaExcel\obj\Debug\TesteImportaExcel.csprojResolveAssemblyReference.cache

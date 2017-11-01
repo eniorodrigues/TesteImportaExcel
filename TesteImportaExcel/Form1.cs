@@ -164,6 +164,7 @@ namespace TesteImportaExcel
                             {
                                 filesAdionado.Add(file);
                                 listBox1.Items.Add(file);
+                                carregaLinhas();
                             }
 
                         }
@@ -238,14 +239,13 @@ namespace TesteImportaExcel
             }
         }
 
-       
-        private void button3_Click_1(object sender, EventArgs e)
+        public void carregaLinhas()
         {
+
             label2.Text = caminho;
 
             MyApp = new Excel.Application();
             MyBook = MyApp.Workbooks.Open(caminho);
-            //  MySheet = (Excel.Worksheet)MyBook.Sheets[1];
 
             excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + caminho + ";Extended Properties=Excel 12.0;";
             Excel.Application app = new Excel.Application();
@@ -254,11 +254,9 @@ namespace TesteImportaExcel
 
             if (MyApp.Workbooks[2].Worksheets[1].name != "Input" && MyApp.Workbooks[2].Worksheets[1].name != "Combined")
             {
-                
+
                 for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[1].UsedRange.Columns.Count; k++)
                 {
-                   
-
 
                     if (Convert.ToString((MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2)) != null && Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2.ToString()) != "")
                     {
@@ -266,7 +264,7 @@ namespace TesteImportaExcel
                         colunas.Add(coluna);
                         listBox2.Items.Add(coluna);
                     }
-    
+
 
                 }
             }
@@ -281,6 +279,12 @@ namespace TesteImportaExcel
 
                 }
             }
+        }
+
+        private void button3_Click_1(object sender, EventArgs e)
+        {
+
+           
 
         }
 

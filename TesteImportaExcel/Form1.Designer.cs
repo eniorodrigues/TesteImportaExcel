@@ -157,7 +157,7 @@
             // 
             this.button4.Location = new System.Drawing.Point(184, 134);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(75, 23);
+            this.button4.Size = new System.Drawing.Size(86, 35);
             this.button4.TabIndex = 18;
             this.button4.Text = "Criar Tabela";
             this.button4.UseVisualStyleBackColor = true;
@@ -184,7 +184,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(610, 287);
+            this.ClientSize = new System.Drawing.Size(599, 287);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.listBox2);
             this.Controls.Add(this.button4);
@@ -200,6 +200,7 @@
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.btnImportarSQL);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "testeBtn";
             this.Text = "Importa Excel";
             this.Load += new System.EventHandler(this.Form1_Load);

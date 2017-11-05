@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.OleDb;
 using System.Data.SqlClient;
@@ -13,6 +11,7 @@ using System.Data.Common;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
 using System.Data.Sql;
+using Microsoft.VisualBasic.FileIO;
 
 namespace TesteImportaExcel
 {
@@ -25,17 +24,19 @@ namespace TesteImportaExcel
 
         public static string path;
         public static string excelConnectionString;
-        string[] files;
-        string conexao;
-        string baseDeDados;
-        string tabela;
-        string caminho;
-        string directoryPath;
+        public string[] files;
+        public string conexao;
+        public string baseDeDados;
+        public string tabela;
+        public string caminho;
+        public string directoryPath;
         private static Excel.Workbook MyBook = null;
         private static Excel.Application MyApp = null;
-        List<string> filesAdionado = new List<string>();
-        List<string> colunas = new List<string>();
-        int v = 0;
+        public List<string> filesAdionado = new List<string>();
+        public List<string> colunas = new List<string>();
+        public string tipoArquivo;
+        DataTable csvData = new DataTable();
+
         private void button1_Click(object sender, EventArgs e)
         {
 
@@ -45,88 +46,93 @@ namespace TesteImportaExcel
             }
             else
 
-            label2.Text = "Importando...";
+                label2.Text = "Importando...";
 
-           try
-           {
+            try
+            {
                 foreach (string element in filesAdionado)
                 {
-                    
-  
-                    MyApp = new Excel.Application();
-                    MyBook = MyApp.Workbooks.Open(directoryPath + "\\" + element);
 
-                    excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 12.0;";
-                    Excel.Application app = new Excel.Application();
-                    MyApp.Workbooks.Add("");
-                    MyApp.Workbooks.Add(@directoryPath + "\\" + element);
-            
-
-                for (int i = 2; i <= MyApp.Workbooks.Count; i++)
+                    if (tipoArquivo == "xls")
                     {
-                        progressBar1.Maximum = MyApp.Workbooks.Item[i].Worksheets.Count;
-                        MessageBox.Show(MyApp.Workbooks.Item[i].Worksheets.Count.ToString());
-                      
-                        for (int j = 1; j <= MyApp.Workbooks[i].Worksheets.Count; j++)
-                        {
-                            if (MyApp.Workbooks[i].Worksheets[j].name != "Input" && MyApp.Workbooks[i].Worksheets[j].name != "Combined")
-                            {
-                                progressBar1.Value = j ;
-                                label2.Text = "Importando arquivo " + element + " da sheet " + MyApp.Workbooks[i].Worksheets[j].name;
- 
-                                using (OleDbConnection connection =
-                                new OleDbConnection(excelConnectionString))
-                                {
-                                connection.Open();
 
-                                    StringBuilder comandoExcel = new StringBuilder();
-                                    for (int h = 0; h < colunas.Count; h++)
+                        MyApp = new Excel.Application();
+                        MyBook = MyApp.Workbooks.Open(directoryPath + "\\" + element);
+
+                        excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 12.0;";
+                        Excel.Application app = new Excel.Application();
+                        MyApp.Workbooks.Add("");
+                        MyApp.Workbooks.Add(@directoryPath + "\\" + element);
+
+
+                        for (int i = 2; i <= MyApp.Workbooks.Count; i++)
+                        {
+                            progressBar1.Maximum = MyApp.Workbooks.Item[i].Worksheets.Count;
+
+                            for (int j = 1; j <= MyApp.Workbooks[i].Worksheets.Count; j++)
+                            {
+                                if (MyApp.Workbooks[i].Worksheets[j].name != "Input" && MyApp.Workbooks[i].Worksheets[j].name != "Combined")
+                                {
+                                    progressBar1.Value = j;
+                                    label2.Text = "Importando arquivo " + element + " da sheet " + MyApp.Workbooks[i].Worksheets[j].name;
+
+                                    using (OleDbConnection connection =
+                                    new OleDbConnection(excelConnectionString))
                                     {
-                                    comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".","#") + "], ");
-                                    }
+                                        connection.Open();
+
+                                        StringBuilder comandoExcel = new StringBuilder();
+                                        for (int h = 0; h < colunas.Count; h++)
+                                        {
+                                            comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#") + "], ");
+                                        }
 
                                         string sheet = MyApp.Workbooks[i].Worksheets[j].name;
                                         string arquivo = element;
                                         string campos = Convert.ToString(comandoExcel);
-                                
-                                    OleDbCommand command = new OleDbCommand
-                                        ("Select " + campos + " '" + sheet + "', ' "+ arquivo +"' FROM [" + MyApp.Workbooks[i].Worksheets[j].name + "$]", connection);
 
-                                    using (DbDataReader dr = command.ExecuteReader())
-                                    {
-                                        // SQL Server Connection String
-                                        string sqlConnectionString = "Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True";
+                                        OleDbCommand command = new OleDbCommand
+                                            ("Select " + campos + " '" + sheet + "', ' " + arquivo + "' FROM [" + MyApp.Workbooks[i].Worksheets[j].name + "$]", connection);
 
-
-                                        // Bulk Copy to SQL Server
-                                        using (SqlBulkCopy bulkCopy =
-                                               new SqlBulkCopy(sqlConnectionString))
+                                        using (DbDataReader dr = command.ExecuteReader())
                                         {
-                                            bulkCopy.DestinationTableName = tabela;
-                                            bulkCopy.WriteToServer(dr);
+                                            // SQL Server Connection String
+                                            string sqlConnectionString = "Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True";
 
+                                            // Bulk Copy to SQL Server
+                                            using (SqlBulkCopy bulkCopy =
+                                                   new SqlBulkCopy(sqlConnectionString))
+                                            {
+                                                bulkCopy.DestinationTableName = tabela;
+                                                bulkCopy.WriteToServer(dr);
+
+                                            }
                                         }
+                                        //   connection.Close();
                                     }
-                                    //   connection.Close();
+
                                 }
 
                             }
 
+
+                        }
+                        if (filesAdionado.Count == 0)
+                        {
+                            MessageBox.Show("Sem arquivo para adicionar");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Importação realizada com sucesso");
                         }
 
 
-                    }
-                    if (filesAdionado.Count == 0)
-                    {
-                        MessageBox.Show("Sem arquivo para adicionar");
+
                     }
                     else
                     {
-                        MessageBox.Show("Importação realizada com sucesso");
+                        InsertDataIntoSQLServerUsingSQLBulkCopy(csvData);
                     }
-
-
-
                 }
             }
             catch (Exception ex)
@@ -140,28 +146,34 @@ namespace TesteImportaExcel
 
 
 
-    public void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
-    {
-        var backgroundWorker = sender as BackgroundWorker;
-        for (int j = 0; j < 100000; j++)
+        public void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-          //  Calculate(j);
-            backgroundWorker.ReportProgress((j * 100) / 100000);
+            var backgroundWorker = sender as BackgroundWorker;
+            for (int j = 0; j < 100000; j++)
+            {
+                //  Calculate(j);
+                backgroundWorker.ReportProgress((j * 100) / 100000);
+            }
         }
-    }
 
         public void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-    {
-        progressBar1.Value = e.ProgressPercentage;
-    }
+        {
+            progressBar1.Value = e.ProgressPercentage;
+        }
 
-    private void button2_Click(object sender, EventArgs e)
+        private void button2_Click(object sender, EventArgs e)
         {
             Stream myStream = null;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
+            //Declaro uma string que será utilizada para receber a linha completa do arquivo 
+            string linha = null;
+            //Declaro um array do tipo string que será utilizado para adicionar o conteudo da linha separado 
+            string[] coluna = null;
+            //realizo o while para ler o conteudo da linha 
+
             openFileDialog1.InitialDirectory = "C:\\";
-            openFileDialog1.Filter = "Csv files (*csv.*)|*csv.*|Excel files (*.xls*)|*.xls*";
+            openFileDialog1.Filter = "Csv files (*.csv*)|*.csv*|Excel files (*.xls*)|*.xls*";
             openFileDialog1.FilterIndex = 2;
             openFileDialog1.RestoreDirectory = true;
             openFileDialog1.Multiselect = true;
@@ -176,6 +188,13 @@ namespace TesteImportaExcel
                         using (myStream)
                         {
 
+                            string ext = Path.GetExtension(openFileDialog1.FileName);
+                            if (ext == ".csv")
+                            {
+                                GetDataTabletFromCSVFile(openFileDialog1.FileName);
+
+                            }
+
 
                             caminho = openFileDialog1.FileName;
                             directoryPath = Path.GetDirectoryName(openFileDialog1.FileName);
@@ -185,7 +204,7 @@ namespace TesteImportaExcel
                             {
                                 filesAdionado.Add(file);
                                 listBox1.Items.Add(file);
-                                carregaLinhas();
+                                 carregaLinhas();
                             }
 
                         }
@@ -198,7 +217,65 @@ namespace TesteImportaExcel
             }
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        public static DataTable GetDataTabletFromCSVFile(string csv_file_path)
+        {
+            
+            DataTable csvData = new DataTable();
+            try
+            {
+
+                using (TextFieldParser csvReader = new TextFieldParser(csv_file_path))
+                {
+                    csvReader.SetDelimiters(new string[] { "," });
+                    csvReader.HasFieldsEnclosedInQuotes = true;
+                    string[] colFields = csvReader.ReadFields();
+                    foreach (string column in colFields)
+                    {
+                        DataColumn datecolumn = new DataColumn(column);
+                        datecolumn.AllowDBNull = true;
+                        csvData.Columns.Add(datecolumn);
+                    }
+                    while (!csvReader.EndOfData)
+                    {
+                        string[] fieldData = csvReader.ReadFields();
+                        //Making empty value as null
+                        for (int i = 0; i < fieldData.Length; i++)
+                        {
+                            if (fieldData[i] == "")
+                            {
+                                fieldData[i] = null;
+                            }
+                        }
+                        csvData.Rows.Add(fieldData);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+            return csvData;
+        }
+
+        public void InsertDataIntoSQLServerUsingSQLBulkCopy(DataTable csvFileData)
+        {
+            using (SqlConnection dbConnection = new SqlConnection(  "Data Source=" + conexao  +";Initial Catalog=" + baseDeDados + ";Integrated Security=true;"))
+            {
+                dbConnection.Open();
+                using (SqlBulkCopy s = new SqlBulkCopy(dbConnection))
+                {
+                    
+                    s.DestinationTableName = tabela;
+                    foreach (var column in csvFileData.Columns)
+                        s.ColumnMappings.Add(column.ToString(), column.ToString());
+                    s.WriteToServer(csvFileData);
+                }
+            }
+
+        }
+
+
+            private void button3_Click(object sender, EventArgs e)
         {
 
         }
@@ -239,7 +316,6 @@ namespace TesteImportaExcel
                         for (int i = 0; i < colunas.Count; i++)
                         {
                             campos.Append("[" + Convert.ToString(colunas[i]) + "] varchar (255), ");
-                            //     MessageBox.Show(campos.ToString());
                         }
                         campos.Append("[Sheet] varchar (255), [Arquivo] varchar(255) )");
                         sql = sql + campos.ToString();

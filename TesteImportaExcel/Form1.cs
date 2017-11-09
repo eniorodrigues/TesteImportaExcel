@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.OleDb;
 using System.Data.SqlClient;
@@ -13,6 +11,7 @@ using System.Data.Common;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
 using System.Data.Sql;
+using Microsoft.VisualBasic.FileIO;
 
 namespace TesteImportaExcel
 {
@@ -25,107 +24,171 @@ namespace TesteImportaExcel
 
         public static string path;
         public static string excelConnectionString;
-        string[] files;
-        string conexao;
-        string baseDeDados;
-        string tabela;
-        string meioCaminho;
-        string caminho;
-        string directoryPath;
+        public string[] files;
+        public string conexao;
+        public string baseDeDados;
+        public string tabela;
+        public string caminho;
+        public string directoryPath;
         private static Excel.Workbook MyBook = null;
         private static Excel.Application MyApp = null;
-        private static Excel.Worksheet MySheet = null;
-        List<string> filesAdionado = new List<string>();
-        bool arquivos ;
-        List<string> colunas = new List<string>();
-        int v = 0;
+        public List<string> filesAdionado = new List<string>();
+        public List<string> colunas = new List<string>();
+        public string tipoArquivo;
+        DataTable csvData = new DataTable();
+        public DataTable arquivoCSV;
+        string ext;
+
         private void button1_Click(object sender, EventArgs e)
         {
 
-            label2.Text = "Importando...";
+            if (filesAdionado.Count == 0)
+            {
+                MessageBox.Show("Adicione arquivos");
+            }
+            else
 
-           try
-           {
+                label2.Text = "Importando...";
+
+            try
+            {
                 foreach (string element in filesAdionado)
                 {
-                   
-                    progressBar1.Maximum = element.Length;
-  
-                    MyApp = new Excel.Application();
-                    MyBook = MyApp.Workbooks.Open(directoryPath + "\\" + element);
 
-                    excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 12.0;";
-                    Excel.Application app = new Excel.Application();
-                    MyApp.Workbooks.Add("");
-                    MyApp.Workbooks.Add(@directoryPath + "\\" + element);
-            
-
-                for (int i = 2; i <= MyApp.Workbooks.Count; i++)
+                    if (tipoArquivo == "xls")
                     {
 
-                        for (int j = 1; j <= MyApp.Workbooks[i].Worksheets.Count; j++)
-                        {
-                            if (MyApp.Workbooks[i].Worksheets[j].name != "Input" && MyApp.Workbooks[i].Worksheets[j].name != "Combined")
-                            {
-                                progressBar1.Value = v;
-                                v++;
-                                label2.Text = "Importando arquivo " + element + " da sheet " + MyApp.Workbooks[i].Worksheets[j].name;
- 
-                                using (OleDbConnection connection =
-                                new OleDbConnection(excelConnectionString))
-                                {
-                                connection.Open();
+                        MyApp = new Excel.Application();
+                        MyBook = MyApp.Workbooks.Open(directoryPath + "\\" + element);
 
-                                    StringBuilder comandoExcel = new StringBuilder();
-                                    for (int h = 0; h < colunas.Count; h++)
+                        excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 12.0;";
+                        Excel.Application app = new Excel.Application();
+                        MyApp.Workbooks.Add("");
+                        MyApp.Workbooks.Add(@directoryPath + "\\" + element);
+
+
+                        for (int i = 2; i <= MyApp.Workbooks.Count; i++)
+                        {
+                            progressBar1.Maximum = MyApp.Workbooks.Item[i].Worksheets.Count;
+
+                            for (int j = 1; j <= MyApp.Workbooks[i].Worksheets.Count; j++)
+                            {
+                                if (MyApp.Workbooks[i].Worksheets[j].name != "Input" && MyApp.Workbooks[i].Worksheets[j].name != "Combined")
+                                {
+                                    progressBar1.Value = j;
+                                    label2.Text = "Importando arquivo " + element + " da sheet " + MyApp.Workbooks[i].Worksheets[j].name;
+
+                                    using (OleDbConnection connection =
+                                    new OleDbConnection(excelConnectionString))
                                     {
-                                    comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".","#") + "], ");
-                                    }
+                                        connection.Open();
+
+                                        StringBuilder comandoExcel = new StringBuilder();
+                                        for (int h = 0; h < colunas.Count; h++)
+                                        {
+                                            comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#") + "], ");
+                                        }
 
                                         string sheet = MyApp.Workbooks[i].Worksheets[j].name;
                                         string arquivo = element;
                                         string campos = Convert.ToString(comandoExcel);
-                                
-                                    OleDbCommand command = new OleDbCommand
-                                        ("Select " + campos + " '" + sheet + "', ' "+ arquivo +"' FROM [" + MyApp.Workbooks[i].Worksheets[j].name + "$]", connection);
 
-                                    using (DbDataReader dr = command.ExecuteReader())
-                                    {
-                                        // SQL Server Connection String
-                                        string sqlConnectionString = "Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True";
+                                        OleDbCommand command = new OleDbCommand
+                                            ("Select " + campos + " '" + sheet + "', ' " + arquivo + "' FROM [" + MyApp.Workbooks[i].Worksheets[j].name + "$]", connection);
 
-
-                                        // Bulk Copy to SQL Server
-                                        using (SqlBulkCopy bulkCopy =
-                                               new SqlBulkCopy(sqlConnectionString))
+                                        using (DbDataReader dr = command.ExecuteReader())
                                         {
-                                            bulkCopy.DestinationTableName = tabela;
-                                            bulkCopy.WriteToServer(dr);
+                                            // SQL Server Connection String
+                                            string sqlConnectionString = "Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + ";Integrated Security=True";
 
+                                            // Bulk Copy to SQL Server
+                                            using (SqlBulkCopy bulkCopy =
+                                                   new SqlBulkCopy(sqlConnectionString))
+                                            {
+                                                bulkCopy.DestinationTableName = tabela;
+                                                bulkCopy.WriteToServer(dr);
+
+                                            }
                                         }
                                     }
-                                    //   connection.Close();
+
                                 }
 
                             }
 
+
+                        }
+                        if (filesAdionado.Count == 0)
+                        {
+                            MessageBox.Show("Sem arquivo para adicionar");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Importação realizada com sucesso");
+                        }
+
+
+
+                    }
+                    else
+                    {
+
+                        MyApp.Workbooks.Add("");
+                        MyApp.Workbooks.Add(@directoryPath + "\\" + element);
+
+                        string server = "BRCAENRODRIGUES\\msSQLEXPRESS";
+                        string database = "teste";
+                        string SQLServerConnectionString = String.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", server, database);
+
+                        string CSVpath = @directoryPath; // CSV file Path
+
+                        string CSVFileConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};;Extended Properties=\"text;HDR=Yes;FMT=Delimited\";", CSVpath);
+
+                        DataTable arquivoCSV;
+
+                        DataTable dt = new DataTable();
+                        using (OleDbConnection con = new OleDbConnection(CSVFileConnectionString))
+                        {
+
+                            StringBuilder comandoExcel = new StringBuilder();
+                            for (int h = 0; h < colunas.Count; h++)
+                            {
+                                comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#").Trim() + "], ");
+                            }
+
+                            con.Open();
+                            var csvQuery = string.Format("select " + comandoExcel.ToString() + "'" + MyApp.Workbooks[3].Worksheets[1].name + "', '" + element + "' from [{0}]", element);
+
+                            using (OleDbDataAdapter da = new OleDbDataAdapter(csvQuery, con))
+                            {
+                                da.Fill(dt);
+                                arquivoCSV = dt;
+                            }
+                        }
+
+                        using (SqlBulkCopy bulkCopy = new SqlBulkCopy(SQLServerConnectionString))
+                        {
+                            int i = 0;
+                            foreach (var nomeColunas in colunas)
+                            {
+                                string nomeColuna = nomeColunas.ToString().Trim();
+                                bulkCopy.ColumnMappings.Add(i, nomeColuna);
+                                i = i + 1;
+
+                            }
+                            bulkCopy.ColumnMappings.Add(i, "Sheet");
+                            bulkCopy.ColumnMappings.Add(i + 1, "Arquivo");
+                            bulkCopy.DestinationTableName = "tabela";
+                            bulkCopy.BatchSize = 0;
+                            bulkCopy.WriteToServer(arquivoCSV);
+                            bulkCopy.Close();
                         }
 
 
                     }
-                    if (filesAdionado.Count == 0)
-                    {
-                        MessageBox.Show("Sem arquivo para adicionar");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Importação realizada com sucesso");
-                    }
-
-
-
                 }
             }
+
             catch (Exception ex)
             {
                 MessageBox.Show("Erro em importar arquivo " + ex.Message);
@@ -134,17 +197,33 @@ namespace TesteImportaExcel
             listBox1.Items.Clear();
         }
 
+
+
+
+        public void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            var backgroundWorker = sender as BackgroundWorker;
+            for (int j = 0; j < 100000; j++)
+            {
+                backgroundWorker.ReportProgress((j * 100) / 100000);
+            }
+        }
+
+        public void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progressBar1.Value = e.ProgressPercentage;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             Stream myStream = null;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
             openFileDialog1.InitialDirectory = "C:\\";
-            openFileDialog1.Filter = "Csv files (*csv.*)|*csv.*|Excel files (*.xls*)|*.xls*";
+            openFileDialog1.Filter = "Csv files (*.csv*)|*.csv*|Excel files (*.xls*)|*.xls*";
             openFileDialog1.FilterIndex = 2;
             openFileDialog1.RestoreDirectory = true;
             openFileDialog1.Multiselect = true;
-
 
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -154,6 +233,46 @@ namespace TesteImportaExcel
                     {
                         using (myStream)
                         {
+
+                            ext = Path.GetExtension(openFileDialog1.FileName);
+                            MessageBox.Show(ext);
+                            if (ext == ".csv")
+                            {
+                                // objeto para leitura de arquivo texto
+                                StreamReader sr = new StreamReader("c:\\Bases\\data.csv");
+                                string linha = "";
+                                int lin = 0;
+
+                                // lê a linha de títulos (nomes dos campos)
+                                // enquanto não for fim do arquivo
+
+                                //cabeçalho
+                                linha = sr.ReadLine();
+                                string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+                                for (int i = 0; i < cab.Length; i++)
+                                {
+                                    dataGridView1.Columns.Add(cab[i].Trim('"'), cab[i].Trim('"'));
+                                }
+
+                                while (!sr.EndOfStream)
+                                {
+                                    // lê a linha atual do arquivo e avança para a próxima
+                                    linha = sr.ReadLine();
+                                    // quebra a linha no caractere ";" e retorna um array contendo as partes
+                                    string[] campos = linha.Split(new String[] { "\",\"", ",\"" }, StringSplitOptions.RemoveEmptyEntries);
+                                    // mostra no grid
+                                    dataGridView1.RowCount++;
+                                    for (int i = 0; i < campos.Length; i++)
+                                    {
+                                        dataGridView1.Rows[lin].Cells[i].Value = campos[i].Trim('"');
+                                    }
+                                    lin++;
+                                }
+                                sr.Close();
+                                sr.Dispose();
+                            }
+
 
 
                             caminho = openFileDialog1.FileName;
@@ -177,6 +296,7 @@ namespace TesteImportaExcel
             }
         }
 
+
         private void button3_Click(object sender, EventArgs e)
         {
 
@@ -194,45 +314,62 @@ namespace TesteImportaExcel
 
         private void button4_Click(object sender, EventArgs e)
         {
-            baseDeDados = comboBoxBase.SelectedItem.ToString();
-            tabela = textBox3.Text;
-
-            using (var con = new SqlConnection("Data Source=" + conexao + " ;Initial Catalog=" + baseDeDados +" ;Integrated Security=True"))
+            if (textBox3.Text == "")
             {
-                con.Open();
-                DataTable databases = con.GetSchema("Databases");
-                string sql = "create table " + tabela + " (";
+                MessageBox.Show("Digite o nome da base");
 
-                StringBuilder campos = new StringBuilder();
+            }
+            else
+            {
 
-                for (int i = 0; i < colunas.Count; i++)
+                try
                 {
-                    campos.Append("[" + Convert.ToString(colunas[i]) + "] varchar (255), ");
-               //     MessageBox.Show(campos.ToString());
-                }
-                campos.Append("[Sheet] varchar (255), [Arquivo] varchar(255) )");
-                sql = sql + campos.ToString();
+                    baseDeDados = comboBoxBase.SelectedItem.ToString();
+                    tabela = textBox3.Text;
 
-                SqlCommand cmd = new SqlCommand(sql, con);
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Tabela " + tabela + " adicionada com sucesso!");
-                con.Close();
+                    using (var con = new SqlConnection("Data Source=" + conexao + " ;Initial Catalog=" + baseDeDados + " ;Integrated Security=True"))
+                    {
+                        con.Open();
+                        DataTable databases = con.GetSchema("Databases");
+                        string sql = "create table " + tabela + " (";
+
+                        StringBuilder campos = new StringBuilder();
+
+                        for (int i = 0; i < colunas.Count; i++)
+                        {
+                            campos.Append("[" + Convert.ToString(colunas[i]) + "] varchar (255), ");
+                        }
+                        campos.Append("[Sheet] varchar (255), [Arquivo] varchar(255) )");
+                        sql = sql + campos.ToString();
+
+                        SqlCommand cmd = new SqlCommand(sql, con);
+                        cmd.ExecuteNonQuery();
+                        MessageBox.Show("Tabela " + tabela + " adicionada com sucesso!");
+                        con.Close();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Erro em importar arquivo " + ex.Message);
+                }
+
             }
 
         }
 
         private void comboBoxConexao_SelectedIndexChanged(object sender, EventArgs e)
         {
-            comboBoxBase.Items.Clear();
+
             conexao = comboBoxConexao.Text;
 
             using (var con = new SqlConnection("Data Source=" + conexao + "; Integrated Security=True;"))
             {
                 con.Open();
                 DataTable databases = con.GetSchema("Databases");
-
+                comboBoxBase.Items.Clear();
                 foreach (DataRow database in databases.Rows)
                 {
+
                     String databaseName = database.Field<String>("database_name");
                     comboBoxBase.Items.Add(databaseName);
                 }
@@ -252,31 +389,55 @@ namespace TesteImportaExcel
             MyApp.Workbooks.Add("");
             MyApp.Workbooks.Add(caminho);
 
-            if (MyApp.Workbooks[2].Worksheets[1].name != "Input" && MyApp.Workbooks[2].Worksheets[1].name != "Combined")
+            if (ext == ".csv")
             {
+                // objeto para leitura de arquivo texto
+                StreamReader sr = new StreamReader("c:\\Bases\\data.csv");
+                string linha = "";
+                int lin = 0;
 
-                for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[1].UsedRange.Columns.Count; k++)
+                // lê a linha de títulos (nomes dos campos)
+                // enquanto não for fim do arquivo
+
+                //cabeçalho
+                linha = sr.ReadLine();
+                string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < cab.Length; i++)
                 {
-
-                    if (Convert.ToString((MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2)) != null && Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2.ToString()) != "")
-                    {
-                        string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2);
-                        colunas.Add(coluna);
-                        listBox2.Items.Add(coluna);
-                    }
-
-
+                    string coluna = cab[i].Trim('"');
+                    colunas.Add(coluna);
+                    listBox2.Items.Add(coluna);
                 }
+
             }
             else
             {
-                for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[2].UsedRange.Columns.Count; k++)
+
+                if (MyApp.Workbooks[2].Worksheets[1].name != "Input" && MyApp.Workbooks[2].Worksheets[1].name != "Combined")
                 {
 
-                    string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[2].Cells[1, k].Value2.ToString());
-                    colunas.Add(coluna);
-                    listBox2.Items.Add(coluna);
+                    for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[1].UsedRange.Columns.Count; k++)
+                    {
 
+                        if (Convert.ToString((MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2)) != null && Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2.ToString()) != "")
+                        {
+                            string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2);
+                            colunas.Add(coluna);
+                            listBox2.Items.Add(coluna);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[2].UsedRange.Columns.Count; k++)
+                    {
+
+                        string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[2].Cells[1, k].Value2.ToString());
+                        colunas.Add(coluna);
+                        listBox2.Items.Add(coluna);
+
+                    }
                 }
             }
         }
@@ -284,12 +445,13 @@ namespace TesteImportaExcel
         private void button3_Click_1(object sender, EventArgs e)
         {
 
-           
+
 
         }
 
         private void comboBoxConexao_Enter(object sender, EventArgs e)
         {
+            comboBoxConexao.Items.Clear();
             string myServer = Environment.MachineName;
 
             DataTable servers = SqlDataSourceEnumerator.Instance.GetDataSources();
@@ -310,48 +472,6 @@ namespace TesteImportaExcel
         {
             baseDeDados = comboBoxBase.SelectedItem.ToString();
         }
-
-        //private void button1_Click_1(object sender, EventArgs e)
-        //{
-        //    label2.Text = "TESTE...";
-
-        //    Excel.Application app = new Excel.Application();
-        //    app.Workbooks.Add("");
-
-        //    foreach (string element in files)
-        //    {
-        //        app.Workbooks.Add(directoryPath + "\\" + element);
-
-        //        for (int i = 2; i <= files.Length; i++)
-        //        {
-        //            for (int j = 1; j <= app.Workbooks[i].Worksheets.Count; j++)
-        //            {
-        //                using (OleDbConnection connection = new OleDbConnection(excelConnectionString))
-        //                {
-        //                    StringBuilder comandoExcel = new StringBuilder();
-
-        //                    for (int h = 0; h < colunas.Count; h++)
-        //                    {
-        //                        comandoExcel.Append("[" + colunas[h].ToString() + "], ");
-        //                    }
-                            
-        //                    comandoExcel.ToString();
-
-        //                    OleDbCommand command = new OleDbCommand
-        //                        ("Select '" + comandoExcel.ToString() + " " +
-        //                        app.Workbooks[i].Worksheets[j].name + "', '" + element + "'  FROM [" + app.Workbooks[i].Worksheets[j].name + "$]", connection);
-
-        //                    string coisa = "Select" + comandoExcel.ToString() + " " + app.Workbooks[i].Worksheets[j].name + "', '" + element + "'  FROM [" + app.Workbooks[i].Worksheets[j].name + "$]";
-
-        //                    MessageBox.Show(coisa);
-
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
-
 
     }
 }

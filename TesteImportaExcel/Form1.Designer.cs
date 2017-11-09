@@ -44,6 +44,8 @@
             this.listBox2 = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.comboBoxTabela = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -121,7 +123,7 @@
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(184, 108);
+            this.textBox3.Location = new System.Drawing.Point(184, 182);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(197, 20);
             this.textBox3.TabIndex = 12;
@@ -129,11 +131,11 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(181, 92);
+            this.label6.Location = new System.Drawing.Point(181, 166);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(89, 13);
+            this.label6.Size = new System.Drawing.Size(72, 13);
             this.label6.TabIndex = 13;
-            this.label6.Text = "Nome da Tabela:";
+            this.label6.Text = "Nova Tabela:";
             // 
             // label7
             // 
@@ -157,9 +159,9 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(184, 134);
+            this.button4.Location = new System.Drawing.Point(184, 208);
             this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(86, 35);
+            this.button4.Size = new System.Drawing.Size(86, 23);
             this.button4.TabIndex = 18;
             this.button4.Text = "Criar Tabela";
             this.button4.UseVisualStyleBackColor = true;
@@ -190,17 +192,37 @@
             this.dataGridView1.Size = new System.Drawing.Size(574, 150);
             this.dataGridView1.TabIndex = 22;
             // 
+            // comboBoxTabela
+            // 
+            this.comboBoxTabela.FormattingEnabled = true;
+            this.comboBoxTabela.Location = new System.Drawing.Point(184, 108);
+            this.comboBoxTabela.Name = "comboBoxTabela";
+            this.comboBoxTabela.Size = new System.Drawing.Size(197, 21);
+            this.comboBoxTabela.TabIndex = 23;
+            this.comboBoxTabela.SelectedIndexChanged += new System.EventHandler(this.comboBoxTabela_SelectedIndexChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(181, 92);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(89, 13);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Nome da Tabela:";
+            // 
             // testeBtn
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(599, 514);
+            this.Controls.Add(this.comboBoxTabela);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.listBox2);
             this.Controls.Add(this.button4);
             this.Controls.Add(this.comboBoxConexao);
             this.Controls.Add(this.label7);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.comboBoxBase);
@@ -239,6 +261,8 @@
         private System.Windows.Forms.ListBox listBox2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.ComboBox comboBoxTabela;
+        private System.Windows.Forms.Label label4;
     }
 }
 

@@ -54,14 +54,16 @@ namespace TesteImportaExcel
             {
                 foreach (string element in filesAdionado)
                 {
-
-                    if (tipoArquivo == "xls")
-                    {
-
+                    MessageBox.Show("netru");
+                    MessageBox.Show(ext);
+                    //if (ext == ".xls")
+                    //{
+                        
                         MyApp = new Excel.Application();
                         MyBook = MyApp.Workbooks.Open(directoryPath + "\\" + element);
 
                         excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 12.0;";
+                        //excelConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 8.0;";
                         Excel.Application app = new Excel.Application();
                         MyApp.Workbooks.Add("");
                         MyApp.Workbooks.Add(@directoryPath + "\\" + element);
@@ -129,63 +131,63 @@ namespace TesteImportaExcel
 
 
 
-                    }
-                    else
-                    {
+                    //}
+                    //else
+                    //{
 
-                        MyApp.Workbooks.Add("");
-                        MyApp.Workbooks.Add(@directoryPath + "\\" + element);
+                        //MyApp.Workbooks.Add("");
+                        //MyApp.Workbooks.Add(@directoryPath + "\\" + element);
 
-                        string server = "BRCAENRODRIGUES\\msSQLEXPRESS";
-                        string database = "teste";
-                        string SQLServerConnectionString = String.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", server, database);
+                        //string server = "BRCAENRODRIGUES\\msSQLEXPRESS";
+                        //string database = "teste";
+                        //string SQLServerConnectionString = String.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", server, database);
 
-                        string CSVpath = @directoryPath; // CSV file Path
+                        //string CSVpath = @directoryPath; // CSV file Path
 
-                        string CSVFileConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};;Extended Properties=\"text;HDR=Yes;FMT=Delimited\";", CSVpath);
+                        //string CSVFileConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};;Extended Properties=\"text;HDR=Yes;FMT=Delimited\";", CSVpath);
 
-                        DataTable arquivoCSV;
+                        //DataTable arquivoCSV;
 
-                        DataTable dt = new DataTable();
-                        using (OleDbConnection con = new OleDbConnection(CSVFileConnectionString))
-                        {
+                        //DataTable dt = new DataTable();
+                        //using (OleDbConnection con = new OleDbConnection(CSVFileConnectionString))
+                        //{
 
-                            StringBuilder comandoExcel = new StringBuilder();
-                            for (int h = 0; h < colunas.Count; h++)
-                            {
-                                comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#").Trim() + "], ");
-                            }
+                        //    StringBuilder comandoExcel = new StringBuilder();
+                        //    for (int h = 0; h < colunas.Count; h++)
+                        //    {
+                        //        comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#").Trim() + "], ");
+                        //    }
 
-                            con.Open();
-                            var csvQuery = string.Format("select " + comandoExcel.ToString() + "'" + MyApp.Workbooks[3].Worksheets[1].name + "', '" + element + "' from [{0}]", element);
+                        //    con.Open();
+                        //    var csvQuery = string.Format("select " + comandoExcel.ToString() + "'" + MyApp.Workbooks[3].Worksheets[1].name + "', '" + element + "' from [{0}]", element);
 
-                            using (OleDbDataAdapter da = new OleDbDataAdapter(csvQuery, con))
-                            {
-                                da.Fill(dt);
-                                arquivoCSV = dt;
-                            }
-                        }
+                        //    using (OleDbDataAdapter da = new OleDbDataAdapter(csvQuery, con))
+                        //    {
+                        //        da.Fill(dt);
+                        //        arquivoCSV = dt;
+                        //    }
+                        //}
 
-                        using (SqlBulkCopy bulkCopy = new SqlBulkCopy(SQLServerConnectionString))
-                        {
-                            int i = 0;
-                            foreach (var nomeColunas in colunas)
-                            {
-                                string nomeColuna = nomeColunas.ToString().Trim();
-                                bulkCopy.ColumnMappings.Add(i, nomeColuna);
-                                i = i + 1;
+                        //using (SqlBulkCopy bulkCopy = new SqlBulkCopy(SQLServerConnectionString))
+                        //{
+                        //    int i = 0;
+                        //    foreach (var nomeColunas in colunas)
+                        //    {
+                        //        string nomeColuna = nomeColunas.ToString().Trim();
+                        //        bulkCopy.ColumnMappings.Add(i, nomeColuna);
+                        //        i = i + 1;
 
-                            }
-                            bulkCopy.ColumnMappings.Add(i, "Sheet");
-                            bulkCopy.ColumnMappings.Add(i + 1, "Arquivo");
-                            bulkCopy.DestinationTableName = "tabela";
-                            bulkCopy.BatchSize = 0;
-                            bulkCopy.WriteToServer(arquivoCSV);
-                            bulkCopy.Close();
-                        }
+                        //    }
+                        //    bulkCopy.ColumnMappings.Add(i, "Sheet");
+                        //    bulkCopy.ColumnMappings.Add(i + 1, "Arquivo");
+                        //    bulkCopy.DestinationTableName = "tabela";
+                        //    bulkCopy.BatchSize = 0;
+                        //    bulkCopy.WriteToServer(arquivoCSV);
+                        //    bulkCopy.Close();
+                        //}
 
 
-                    }
+                    //}
                 }
             }
 
@@ -235,7 +237,6 @@ namespace TesteImportaExcel
                         {
 
                             ext = Path.GetExtension(openFileDialog1.FileName);
-                            MessageBox.Show(ext);
                             if (ext == ".csv")
                             {
                                 // objeto para leitura de arquivo texto
@@ -283,8 +284,9 @@ namespace TesteImportaExcel
                             {
                                 filesAdionado.Add(file);
                                 listBox1.Items.Add(file);
-                                carregaLinhas();
+                                
                             }
+                            carregaLinhas();
 
                         }
                     }
@@ -471,7 +473,40 @@ namespace TesteImportaExcel
         private void comboBoxBase_SelectedIndexChanged(object sender, EventArgs e)
         {
             baseDeDados = comboBoxBase.SelectedItem.ToString();
+
+            using (var con = new SqlConnection("Data Source=" + conexao + ";Initial Catalog=" + baseDeDados +"; Integrated Security=True;"))
+            {
+                con.Open();
+                DataTable t = con.GetSchema("Tables");
+                comboBoxTabela.Items.Clear();
+                foreach (DataRow ta in t.Rows)
+                {
+
+                    String datatableName = ta.Field<String>("table_name");
+                    comboBoxTabela.Items.Add(datatableName);
+                }
+            }
         }
 
+        private void comboBoxTabela_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            tabela = comboBoxTabela.SelectedItem.ToString();
+
+            List<string> listacolumnas = new List<string>();
+            using (SqlConnection connection = new SqlConnection("Data Source=" + conexao + " ;Initial Catalog=" + baseDeDados + " ;Integrated Security=True"))
+            using (SqlCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "select c.name from sys.columns c inner join sys.tables t on t.object_id = c.object_id where t.name = '" + tabela+ "'";
+                connection.Open();
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        listacolumnas.Add(reader.GetString(0));
+                        listBox2.Items.Add(reader.GetString(0));
+                    }
+                }
+            }
+        }
     }
 }

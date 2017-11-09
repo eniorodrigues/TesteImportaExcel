@@ -1,0 +1,11 @@
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\bin\x64\Debug\TesteImportaExcel.exe.config
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\bin\x64\Debug\TesteImportaExcel.exe
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\bin\x64\Debug\TesteImportaExcel.pdb
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\bin\x64\Debug\EPPlus.dll
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\bin\x64\Debug\EPPlus.xml
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.testeBtn.resources
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.Properties.Resources.resources
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.csproj.GenerateResource.Cache
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.csproj.CoreCompileInputs.cache
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.exe
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.pdb

@@ -34,6 +34,7 @@ namespace TesteImportaExcel
         private static Excel.Application MyApp = null;
         public List<string> filesAdionado = new List<string>();
         public List<string> colunas = new List<string>();
+        public List<string> colunasCreate = new List<string>();
         public string tipoArquivo;
         DataTable csvData = new DataTable();
         public DataTable arquivoCSV;
@@ -54,8 +55,8 @@ namespace TesteImportaExcel
             {
                 foreach (string element in filesAdionado)
                 {
-                    MessageBox.Show("netru");
-                    MessageBox.Show(ext);
+                 
+
                     //if (ext == ".xls")
                     //{
                         
@@ -92,10 +93,10 @@ namespace TesteImportaExcel
                                         string sheet = MyApp.Workbooks[i].Worksheets[j].name;
                                         string arquivo = element;
                                         string campos = Convert.ToString(comandoExcel);
-
+                                    
                                         OleDbCommand command = new OleDbCommand
                                             ("Select " + campos + " '" + sheet + "', ' " + arquivo + "' FROM [" + MyApp.Workbooks[i].Worksheets[j].name + "$]", connection);
-
+                                    //MessageBox.Show(command.CommandText);
                                         using (DbDataReader dr = command.ExecuteReader())
                                         {
                                             // SQL Server Connection String
@@ -333,11 +334,11 @@ namespace TesteImportaExcel
 
                         for (int i = 0; i < colunas.Count; i++)
                         {
-                            campos.Append("[" + Convert.ToString(colunas[i]) + "] varchar (255), ");
+                            campos.Append("[" + Convert.ToString(colunasCreate[i]) + "] varchar (255), ");
                         }
                         campos.Append("[Sheet] varchar (255), [Arquivo] varchar(255) )");
                         sql = sql + campos.ToString();
-
+                        //MessageBox.Show(sql);
                         SqlCommand cmd = new SqlCommand(sql, con);
                         cmd.ExecuteNonQuery();
                         MessageBox.Show("Tabela " + tabela + " adicionada com sucesso!");
@@ -403,7 +404,8 @@ namespace TesteImportaExcel
                 {
                     string coluna = cab[i].Trim('"');
                     colunas.Add(coluna);
-                    listBox2.Items.Add(coluna);
+                    colunasCreate.Add(coluna.Trim());
+                    listBox2.Items.Add(colunasCreate);
                 }
 
             }
@@ -420,7 +422,8 @@ namespace TesteImportaExcel
                         {
                             string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2);
                             colunas.Add(coluna);
-                            listBox2.Items.Add(coluna);
+                            colunasCreate.Add(coluna.Trim());
+                            listBox2.Items.Add(coluna.Trim());
                         }
                     }
                 }
@@ -431,7 +434,8 @@ namespace TesteImportaExcel
 
                         string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[2].Cells[1, k].Value2.ToString());
                         colunas.Add(coluna);
-                        listBox2.Items.Add(coluna);
+                        colunasCreate.Add(coluna.Trim());
+                        listBox2.Items.Add(coluna.Trim());
 
                     }
                 }

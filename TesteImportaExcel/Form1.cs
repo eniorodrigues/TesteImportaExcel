@@ -12,6 +12,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
 using System.Data.Sql;
 using Microsoft.VisualBasic.FileIO;
+using System.Runtime.InteropServices;
 
 namespace TesteImportaExcel
 {
@@ -61,11 +62,7 @@ namespace TesteImportaExcel
                     //{
                         
                         MyApp = new Excel.Application();
-                        MyBook = MyApp.Workbooks.Open(directoryPath + "\\" + element);
-
                         excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 12.0;";
-                        //excelConnectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + directoryPath + "\\" + element + ";Extended Properties=Excel 8.0;";
-                        Excel.Application app = new Excel.Application();
                         MyApp.Workbooks.Add("");
                         MyApp.Workbooks.Add(@directoryPath + "\\" + element);
 
@@ -112,82 +109,88 @@ namespace TesteImportaExcel
                                             }
                                         }
                                     }
-
+                                 
+                           
                                 }
 
                             }
 
-
+                            
                         }
-                        if (filesAdionado.Count == 0)
+                   
+                    if (filesAdionado.Count == 0)
                         {
                             MessageBox.Show("Sem arquivo para adicionar");
                         }
-                        else
-                        {
-                            MessageBox.Show("Importação realizada com sucesso");
-                        }
-
 
 
                     //}
                     //else
                     //{
 
-                        //MyApp.Workbooks.Add("");
-                        //MyApp.Workbooks.Add(@directoryPath + "\\" + element);
+                    //MyApp.Workbooks.Add("");
+                    //MyApp.Workbooks.Add(@directoryPath + "\\" + element);
 
-                        //string server = "BRCAENRODRIGUES\\msSQLEXPRESS";
-                        //string database = "teste";
-                        //string SQLServerConnectionString = String.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", server, database);
+                    //string server = "BRCAENRODRIGUES\\msSQLEXPRESS";
+                    //string database = "teste";
+                    //string SQLServerConnectionString = String.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", server, database);
 
-                        //string CSVpath = @directoryPath; // CSV file Path
+                    //string CSVpath = @directoryPath; // CSV file Path
 
-                        //string CSVFileConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};;Extended Properties=\"text;HDR=Yes;FMT=Delimited\";", CSVpath);
+                    //string CSVFileConnectionString = String.Format("Provider=Microsoft.Jet.OLEDB.4.0;Data Source={0};;Extended Properties=\"text;HDR=Yes;FMT=Delimited\";", CSVpath);
 
-                        //DataTable arquivoCSV;
+                    //DataTable arquivoCSV;
 
-                        //DataTable dt = new DataTable();
-                        //using (OleDbConnection con = new OleDbConnection(CSVFileConnectionString))
-                        //{
+                    //DataTable dt = new DataTable();
+                    //using (OleDbConnection con = new OleDbConnection(CSVFileConnectionString))
+                    //{
 
-                        //    StringBuilder comandoExcel = new StringBuilder();
-                        //    for (int h = 0; h < colunas.Count; h++)
-                        //    {
-                        //        comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#").Trim() + "], ");
-                        //    }
+                    //    StringBuilder comandoExcel = new StringBuilder();
+                    //    for (int h = 0; h < colunas.Count; h++)
+                    //    {
+                    //        comandoExcel.Append("[" + Convert.ToString(colunas[h]).Replace(".", "#").Trim() + "], ");
+                    //    }
 
-                        //    con.Open();
-                        //    var csvQuery = string.Format("select " + comandoExcel.ToString() + "'" + MyApp.Workbooks[3].Worksheets[1].name + "', '" + element + "' from [{0}]", element);
+                    //    con.Open();
+                    //    var csvQuery = string.Format("select " + comandoExcel.ToString() + "'" + MyApp.Workbooks[3].Worksheets[1].name + "', '" + element + "' from [{0}]", element);
 
-                        //    using (OleDbDataAdapter da = new OleDbDataAdapter(csvQuery, con))
-                        //    {
-                        //        da.Fill(dt);
-                        //        arquivoCSV = dt;
-                        //    }
-                        //}
+                    //    using (OleDbDataAdapter da = new OleDbDataAdapter(csvQuery, con))
+                    //    {
+                    //        da.Fill(dt);
+                    //        arquivoCSV = dt;
+                    //    }
+                    //}
 
-                        //using (SqlBulkCopy bulkCopy = new SqlBulkCopy(SQLServerConnectionString))
-                        //{
-                        //    int i = 0;
-                        //    foreach (var nomeColunas in colunas)
-                        //    {
-                        //        string nomeColuna = nomeColunas.ToString().Trim();
-                        //        bulkCopy.ColumnMappings.Add(i, nomeColuna);
-                        //        i = i + 1;
+                    //using (SqlBulkCopy bulkCopy = new SqlBulkCopy(SQLServerConnectionString))
+                    //{
+                    //    int i = 0;
+                    //    foreach (var nomeColunas in colunas)
+                    //    {
+                    //        string nomeColuna = nomeColunas.ToString().Trim();
+                    //        bulkCopy.ColumnMappings.Add(i, nomeColuna);
+                    //        i = i + 1;
 
-                        //    }
-                        //    bulkCopy.ColumnMappings.Add(i, "Sheet");
-                        //    bulkCopy.ColumnMappings.Add(i + 1, "Arquivo");
-                        //    bulkCopy.DestinationTableName = "tabela";
-                        //    bulkCopy.BatchSize = 0;
-                        //    bulkCopy.WriteToServer(arquivoCSV);
-                        //    bulkCopy.Close();
-                        //}
+                    //    }
+                    //    bulkCopy.ColumnMappings.Add(i, "Sheet");
+                    //    bulkCopy.ColumnMappings.Add(i + 1, "Arquivo");
+                    //    bulkCopy.DestinationTableName = "tabela";
+                    //    bulkCopy.BatchSize = 0;
+                    //    bulkCopy.WriteToServer(arquivoCSV);
+                    //    bulkCopy.Close();
+                    //}
 
 
                     //}
+                   // app.Quit();
+                 
+                   
                 }
+                MyApp.Quit();
+                MyApp.Workbooks.Close();
+                Marshal.ReleaseComObject(MyApp.Workbooks);
+                Marshal.ReleaseComObject(MyApp);
+                MessageBox.Show("Importação realizada com sucesso");
+               
             }
 
             catch (Exception ex)
@@ -196,6 +199,12 @@ namespace TesteImportaExcel
             }
             filesAdionado.Clear();
             listBox1.Items.Clear();
+            
+          //  MyBook.Close(0);
+            MyApp.Quit();
+            MyApp.Workbooks.Close();
+            Marshal.ReleaseComObject(MyApp);
+            //Marshal.ReleaseComObject(MyApp.Workbooks);
         }
 
 
@@ -282,6 +291,7 @@ namespace TesteImportaExcel
                                 listBox1.Items.Add(file);
                                 
                             }
+                            
                             carregaLinhas();
 
                         }
@@ -379,10 +389,7 @@ namespace TesteImportaExcel
             label2.Text = caminho;
 
             MyApp = new Excel.Application();
-            MyBook = MyApp.Workbooks.Open(caminho);
-
             excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + caminho + ";Extended Properties=Excel 12.0;";
-            Excel.Application app = new Excel.Application();
             MyApp.Workbooks.Add("");
             MyApp.Workbooks.Add(caminho);
 
@@ -440,6 +447,10 @@ namespace TesteImportaExcel
                     }
                 }
             }
+            MyApp.Quit();
+            MyApp.Workbooks.Close();
+            Marshal.ReleaseComObject(MyApp.Workbooks);
+            Marshal.ReleaseComObject(MyApp);
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -509,7 +520,7 @@ namespace TesteImportaExcel
 
         private void buttonLimpar_Click(object sender, EventArgs e)
         {
-            colunas.Clear();
+           
             listBox2.Items.Clear();
         }
     }

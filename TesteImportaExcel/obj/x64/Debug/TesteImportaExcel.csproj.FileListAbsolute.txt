@@ -9,3 +9,4 @@ C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImpor
 C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.csproj.CoreCompileInputs.cache
 C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.exe
 C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.pdb
+C:\Users\enrodrigues\Desktop\Programa Importa Excel\TesteImportaExcel\TesteImportaExcel\obj\x64\Debug\TesteImportaExcel.csprojResolveAssemblyReference.cache

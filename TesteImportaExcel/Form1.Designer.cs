@@ -32,7 +32,6 @@
             this.button2 = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.comboBoxBase = new System.Windows.Forms.ComboBox();
@@ -46,6 +45,7 @@
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.comboBoxTabela = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.buttonLimpar = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -86,13 +86,6 @@
             this.label1.Size = new System.Drawing.Size(51, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Arquivos:";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Location = new System.Drawing.Point(15, 250);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(344, 23);
-            this.progressBar1.TabIndex = 5;
             // 
             // label2
             // 
@@ -172,7 +165,7 @@
             this.listBox2.FormattingEnabled = true;
             this.listBox2.Location = new System.Drawing.Point(396, 25);
             this.listBox2.Name = "listBox2";
-            this.listBox2.Size = new System.Drawing.Size(191, 251);
+            this.listBox2.Size = new System.Drawing.Size(191, 173);
             this.listBox2.TabIndex = 20;
             // 
             // label3
@@ -180,9 +173,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(393, 9);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(99, 13);
+            this.label3.Size = new System.Drawing.Size(45, 13);
             this.label3.TabIndex = 21;
-            this.label3.Text = "Colunas do Arquivo";
+            this.label3.Text = "Colunas";
             // 
             // dataGridView1
             // 
@@ -210,11 +203,22 @@
             this.label4.TabIndex = 13;
             this.label4.Text = "Nome da Tabela:";
             // 
+            // buttonLimpar
+            // 
+            this.buttonLimpar.Location = new System.Drawing.Point(396, 207);
+            this.buttonLimpar.Name = "buttonLimpar";
+            this.buttonLimpar.Size = new System.Drawing.Size(75, 23);
+            this.buttonLimpar.TabIndex = 24;
+            this.buttonLimpar.Text = "Limpar Colunas";
+            this.buttonLimpar.UseVisualStyleBackColor = true;
+            this.buttonLimpar.Click += new System.EventHandler(this.buttonLimpar_Click);
+            // 
             // testeBtn
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(599, 514);
+            this.Controls.Add(this.buttonLimpar);
             this.Controls.Add(this.comboBoxTabela);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.label3);
@@ -228,7 +232,6 @@
             this.Controls.Add(this.comboBoxBase);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.button2);
@@ -249,7 +252,6 @@
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ListBox listBox1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox comboBoxBase;
@@ -263,6 +265,7 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ComboBox comboBoxTabela;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button buttonLimpar;
     }
 }
 

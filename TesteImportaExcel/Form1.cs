@@ -71,13 +71,11 @@ namespace TesteImportaExcel
 
                         for (int i = 2; i <= MyApp.Workbooks.Count; i++)
                         {
-                            progressBar1.Maximum = MyApp.Workbooks.Item[i].Worksheets.Count;
-
+                            
                             for (int j = 1; j <= MyApp.Workbooks[i].Worksheets.Count; j++)
                             {
                                 if (MyApp.Workbooks[i].Worksheets[j].name != "Input" && MyApp.Workbooks[i].Worksheets[j].name != "Combined")
                                 {
-                                    progressBar1.Value = j;
                                     label2.Text = "Importando arquivo " + element + " da sheet " + MyApp.Workbooks[i].Worksheets[j].name;
 
                                     using (OleDbConnection connection =
@@ -213,7 +211,6 @@ namespace TesteImportaExcel
 
         public void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            progressBar1.Value = e.ProgressPercentage;
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -240,7 +237,7 @@ namespace TesteImportaExcel
                             if (ext == ".csv")
                             {
                                 // objeto para leitura de arquivo texto
-                                StreamReader sr = new StreamReader("c:\\Bases\\data.csv");
+                                StreamReader sr = new StreamReader("c:\\Bases\\eee.csv");
                                 string linha = "";
                                 int lin = 0;
 
@@ -261,7 +258,7 @@ namespace TesteImportaExcel
                                     // lê a linha atual do arquivo e avança para a próxima
                                     linha = sr.ReadLine();
                                     // quebra a linha no caractere ";" e retorna um array contendo as partes
-                                    string[] campos = linha.Split(new String[] { "\",\"", ",\"" }, StringSplitOptions.RemoveEmptyEntries);
+                                    string[] campos = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
                                     // mostra no grid
                                     dataGridView1.RowCount++;
                                     for (int i = 0; i < campos.Length; i++)
@@ -273,8 +270,6 @@ namespace TesteImportaExcel
                                 sr.Close();
                                 sr.Dispose();
                             }
-
-
 
                             caminho = openFileDialog1.FileName;
                             directoryPath = Path.GetDirectoryName(openFileDialog1.FileName);
@@ -319,7 +314,6 @@ namespace TesteImportaExcel
             if (textBox3.Text == "")
             {
                 MessageBox.Show("Digite o nome da base");
-
             }
             else
             {
@@ -507,6 +501,12 @@ namespace TesteImportaExcel
                     }
                 }
             }
+        }
+
+        private void buttonLimpar_Click(object sender, EventArgs e)
+        {
+            colunas.Clear();
+            listBox2.Items.Clear();
         }
     }
 }

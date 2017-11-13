@@ -247,7 +247,7 @@ namespace TesteImportaExcel
                                 //cabeçalho
                                 linha = sr.ReadLine();
                                 string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-
+                                //
                                 for (int i = 0; i < cab.Length; i++)
                                 {
                                     dataGridView1.Columns.Add(cab[i].Trim('"'), cab[i].Trim('"'));

@@ -178,7 +178,7 @@ namespace TesteImportaExcel
             for (int j = 0; j < 100000; j++)
             {
                 backgroundWorker.ReportProgress((j * 100) / 100000);
-            }
+             }
         }
 
         public void backgroundWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)

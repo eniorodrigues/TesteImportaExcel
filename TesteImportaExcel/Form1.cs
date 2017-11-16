@@ -13,6 +13,7 @@ using System.IO;
 using System.Data.Sql;
 using Microsoft.VisualBasic.FileIO;
 using System.Runtime.InteropServices;
+using LumenWorks.Framework.IO.Csv;
 
 namespace TesteImportaExcel
 {
@@ -179,7 +180,6 @@ namespace TesteImportaExcel
 
                 foreach (string element in filesAdionado)
                 {
-
                     StreamReader sr = new StreamReader(@directoryPath + "\\" + element);
 
                     string linha = "";
@@ -192,6 +192,8 @@ namespace TesteImportaExcel
                     linha = sr.ReadLine();
                     while (!sr.EndOfStream)
                     {
+
+
                         // lê a linha atual do arquivo e avança para a próxima
                         linha = sr.ReadLine();
                         //// quebra a linha no caractere ";" e retorna um array contendo as partes
@@ -209,12 +211,12 @@ namespace TesteImportaExcel
                     sr.Dispose();
 
                 }
-                    filesAdionado.Clear();
+                filesAdionado.Clear();
                 listBox1.Items.Clear();
             }
         }
 
-           
+
 
         public void backgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -251,10 +253,10 @@ namespace TesteImportaExcel
                         {
 
                             ext = Path.GetExtension(openFileDialog1.FileName);
-  
+
                             if (ext == ".csv")
                             {
-                                 // objeto para leitura de arquivo texto
+                                // objeto para leitura de arquivo texto
                                 StreamReader sr = new StreamReader(openFileDialog1.FileName);
                                 string linha = "";
                                 int lin = 0;
@@ -264,11 +266,11 @@ namespace TesteImportaExcel
 
                                 //cabeçalho
                                 linha = sr.ReadLine();
-                                string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                                string[] cab = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
                                 //
                                 for (int i = 0; i < cab.Length; i++)
                                 {
-                                    dataGridView1.Columns.Add(cab[i].Trim('"'), cab[i].Trim('"'));
+                                //    dataGridView1.Columns.Add(cab[i].Trim('"'), cab[i].Trim('"'));
                                 }
 
                                 while (!sr.EndOfStream)
@@ -276,12 +278,12 @@ namespace TesteImportaExcel
                                     // lê a linha atual do arquivo e avança para a próxima
                                     linha = sr.ReadLine();
                                     // quebra a linha no caractere ";" e retorna um array contendo as partes
-                                    string[] campos = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                                    string[] campos = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
                                     // mostra no grid
-                                    dataGridView1.RowCount++;
+                                  //  dataGridView1.RowCount++;
                                     for (int i = 0; i < campos.Length; i++)
                                     {
-                                        dataGridView1.Rows[lin].Cells[i].Value = campos[i].Trim('"');
+                                   //     dataGridView1.Rows[lin].Cells[i].Value = campos[i].Trim('"');
                                     }
                                     lin++;
                                 }
@@ -293,14 +295,14 @@ namespace TesteImportaExcel
                             caminho = openFileDialog1.FileName;
                             directoryPath = Path.GetDirectoryName(openFileDialog1.FileName);
                             files = (openFileDialog1.SafeFileNames);
- 
+
                             foreach (string file in files)
                             {
                                 filesAdionado.Add(file);
                                 listBox1.Items.Add(file);
-                                
+
                             }
-                            
+
                             carregaLinhas();
 
                         }
@@ -308,7 +310,7 @@ namespace TesteImportaExcel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show( ex.Message);
+                    MessageBox.Show(ex.Message);
                 }
             }
         }
@@ -486,7 +488,7 @@ namespace TesteImportaExcel
         {
             baseDeDados = comboBoxBase.SelectedItem.ToString();
 
-            using (var con = new SqlConnection("Data Source=" + conexao + ";Initial Catalog=" + baseDeDados +"; Integrated Security=True;"))
+            using (var con = new SqlConnection("Data Source=" + conexao + ";Initial Catalog=" + baseDeDados + "; Integrated Security=True;"))
             {
                 con.Open();
                 DataTable t = con.GetSchema("Tables");
@@ -508,7 +510,7 @@ namespace TesteImportaExcel
             using (SqlConnection connection = new SqlConnection("Data Source=" + conexao + " ;Initial Catalog=" + baseDeDados + " ;Integrated Security=True"))
             using (SqlCommand command = connection.CreateCommand())
             {
-                command.CommandText = "select c.name from sys.columns c inner join sys.tables t on t.object_id = c.object_id where t.name = '" + tabela+ "'";
+                command.CommandText = "select c.name from sys.columns c inner join sys.tables t on t.object_id = c.object_id where t.name = '" + tabela + "'";
                 connection.Open();
                 using (var reader = command.ExecuteReader())
                 {
@@ -516,7 +518,7 @@ namespace TesteImportaExcel
                     {
                         listacolumnas.Add(reader.GetString(0));
                         listBox2.Items.Add(reader.GetString(0));
-                        
+
                     }
                 }
             }
@@ -525,73 +527,68 @@ namespace TesteImportaExcel
         private void buttonLimpar_Click(object sender, EventArgs e)
         {
             SqlConnection conn = new SqlConnection("Data Source=BRCAENRODRIGUES\\SQLEXPRESS;Initial Catalog=test;Integrated Security=True");
-            //listBox2.Items.Clear();
             conn.Open();
-            foreach (string element in filesAdionado)
-            {
-                // objeto para leitura de arquivo texto
-                StreamReader sr = new StreamReader(@directoryPath + "\\" + element);
-                string linha = "";
-                int lin = 0;
+            SqlTransaction transaction = conn.BeginTransaction();
 
-                // lê a linha de títulos (nomes dos campos)
-                // enquanto não for fim do arquivo
+           // foreach (string element in filesAdionado)
 
-                //cabeçalho
-                linha = sr.ReadLine();
-                string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 0; i < cab.Length; i++)
+           // {
+                using (StreamReader sr = new StreamReader("C:\\Bases\\COR DOF 012017.csv"))
                 {
-                    dataGridView1.Columns.Add(cab[i].Trim('"'), cab[i].Trim('"'));
-                }
+                    DataTable dataTable = new DataTable();
 
+                    string linha = "";
+                    int lin = 0;
 
-                while (!sr.EndOfStream)
-                {
-                    // lê a linha atual do arquivo e avança para a próxima
                     linha = sr.ReadLine();
-                    // quebra a linha no caractere ";" e retorna um array contendo as partes
-                    string[] campos = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-                    // mostra no grid
+                    string[] cab = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
+                    for (int i = 0; i < cab.Length; i++)
+                    {
+                        dataTable.Columns.Add(cab[i].Trim('"'));
+                    }
 
-                    // define the INSERT statement using **PARAMETERS**
-                    string insertStmt = "INSERT INTO dbo.REPORT_MARJORIE_ROLE(ROLE_ID, CREATED) " +
-                                        "VALUES(@RoleID, @CREATED)";
-
-                    // set up connection and command objects in ADO.NET
-                   
-
-
-                       SqlCommand cmd = new SqlCommand(insertStmt, conn);
+                    while (!sr.EndOfStream)
+                    {
+                        linha = sr.ReadLine();
+                        try
                         {
-                            cmd.Parameters.Add("@RoleID", SqlDbType.VarChar);
-                           
+                            string[] campos = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
+                            DataRow row = dataTable.NewRow();
 
                             for (int i = 0; i < campos.Length; i++)
                             {
-                                // iterate over all RoleID's and execute the INSERT statement for each of them
-                                foreach (string roleID in campos)
-                                {
-                                    MessageBox.Show(roleID);
-                                    cmd.Parameters["@RoleID"].Value = roleID;
-                                CREATED
-                                    cmd.ExecuteNonQuery();
-                                }
-
-
+                                row[i] = campos[i].Trim('"');
                             }
-                            lin++;
+
+                            dataTable.Rows.Add(row);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
                         }
 
+                    }
 
+                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn))
+                {
+                    bulkCopy.DestinationTableName = "dbo.tabela";
 
-                    
+                    try
+                    {
+                        bulkCopy.WriteToServer(dataTable);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
-                conn.Close();
-            }
+                dataGridView1.DataSource = dataTable;
+                }
+                  conn.Close();
+
         }
     }
 }

@@ -43,7 +43,8 @@ namespace TesteImportaExcel
         Excel.Workbook xlWorkBook;
         Excel.Worksheet xlWorkSheet;
         Stream myStream = null;
-        string[] campos;
+        //string[] campos;
+        bool adicionado = false;
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -180,35 +181,61 @@ namespace TesteImportaExcel
 
                 foreach (string element in filesAdionado)
                 {
-                    StreamReader sr = new StreamReader(@directoryPath + "\\" + element);
-
-                    string linha = "";
-                    int lin = 0;
-
-                    // lê a linha de títulos (nomes dos campos)
-                    // enquanto não for fim do arquivo
-
-                    //cabeçalho
-                    linha = sr.ReadLine();
-                    while (!sr.EndOfStream)
+                    using (StreamReader sr = new StreamReader(@directoryPath + "\\" + element))
                     {
+                        DataTable dataTable = new DataTable();
 
+                        string linha = "";
 
-                        // lê a linha atual do arquivo e avança para a próxima
                         linha = sr.ReadLine();
-                        //// quebra a linha no caractere ";" e retorna um array contendo as partes
-                        campos = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] cab = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
 
-                        // mostra no grid
-                        dataGridView1.RowCount++;
-                        for (int i = 0; i < campos.Length; i++)
+                        for (int i = 0; i < cab.Length; i++)
                         {
-                            dataGridView1.Rows[lin].Cells[i].Value = campos[i].Trim('"');
+                            dataTable.Columns.Add(cab[i].Trim('"'));
                         }
-                        lin++;
+                        dataTable.Columns.Add("Sheet");
+                        dataTable.Columns.Add("Arquivo");
+
+                        while (!sr.EndOfStream)
+                        {
+                            linha = sr.ReadLine();
+                            try
+                            {
+                                string[] campos = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
+                                DataRow row = dataTable.NewRow();
+                                int i = 0;
+
+                                for ( i = 0; i < campos.Length; i++)
+                                {
+                                    row[i] = campos[i].Trim('"');
+                                }
+                                row[i] = element;
+                                row[i + 1] = element;
+                                dataTable.Rows.Add(row);
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show(ex.Message);
+                            }
+
+                        }
+
+
+                        using (SqlConnection cn = new SqlConnection("Data Source=" + conexao +";Initial Catalog=" + baseDeDados +";Integrated Security=True"))
+                        {
+                            cn.Open();
+                            using (SqlBulkCopy copy = new SqlBulkCopy(cn))
+                            {
+
+                                copy.DestinationTableName = tabela;
+                                copy.WriteToServer(dataTable);
+                            }
+                            cn.Close();
+                        }
+
+                        dataGridView1.DataSource = dataTable;
                     }
-                    sr.Close();
-                    sr.Dispose();
 
                 }
                 filesAdionado.Clear();
@@ -387,7 +414,6 @@ namespace TesteImportaExcel
                 comboBoxBase.Items.Clear();
                 foreach (DataRow database in databases.Rows)
                 {
-
                     String databaseName = database.Field<String>("database_name");
                     comboBoxBase.Items.Add(databaseName);
                 }
@@ -396,66 +422,70 @@ namespace TesteImportaExcel
 
         public void carregaLinhas()
         {
-
-            label2.Text = caminho;
-            MyApp = new Excel.Application();
-            excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + caminho + ";Extended Properties=Excel 12.0;";
-            MyApp.Workbooks.Add("");
-            MyApp.Workbooks.Add(caminho);
-
-            if (ext == ".csv")
+            if (adicionado == false)
             {
-                // objeto para leitura de arquivo texto
-                StreamReader sr = new StreamReader(myStream);
-                string linha = "";
-                int lin = 0;
+                label2.Text = caminho;
+                MyApp = new Excel.Application();
+                excelConnectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + caminho + ";Extended Properties=Excel 12.0;";
+                MyApp.Workbooks.Add("");
+                MyApp.Workbooks.Add(caminho);
 
-                // lê a linha de títulos (nomes dos campos)
-                // enquanto não for fim do arquivo
-
-                //cabeçalho
-                linha = sr.ReadLine();
-                string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 0; i < cab.Length; i++)
+                if (ext == ".csv")
                 {
-                    string coluna = cab[i].Trim('"');
-                    colunas.Add(coluna);
-                    colunasCreate.Add(coluna.Trim());
-                    listBox2.Items.Add(coluna);
-                }
+                    // objeto para leitura de arquivo texto
+                    StreamReader sr = new StreamReader(myStream);
+                    string linha = "";
+                    //   int lin = 0;
 
-            }
-            else
-            {
-                if (MyApp.Workbooks[2].Worksheets[1].name != "Input" && MyApp.Workbooks[2].Worksheets[1].name != "Combined")
-                {
-                    for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[1].UsedRange.Columns.Count; k++)
+                    // lê a linha de títulos (nomes dos campos)
+                    // enquanto não for fim do arquivo
+
+                    //cabeçalho
+                    linha = sr.ReadLine();
+                    string[] cab = linha.Split(new String[] { "\",\"", ",\"", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
+
+                    for (int i = 0; i < cab.Length; i++)
                     {
-                        if (Convert.ToString((MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2)) != null && Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2.ToString()) != "")
+                        string coluna = cab[i].Trim('"');
+                        colunas.Add(coluna);
+                        colunasCreate.Add(coluna.Trim());
+                        listBox2.Items.Add(coluna);
+                    }
+
+                }
+                else
+                {
+                    if (MyApp.Workbooks[2].Worksheets[1].name != "Input" && MyApp.Workbooks[2].Worksheets[1].name != "Combined")
+                    {
+                        for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[1].UsedRange.Columns.Count; k++)
                         {
-                            string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2);
+                            if (Convert.ToString((MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2)) != null && Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2.ToString()) != "")
+                            {
+                                string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[1].Cells[1, k].Value2);
+                                colunas.Add(coluna);
+                                colunasCreate.Add(coluna.Trim());
+                                listBox2.Items.Add(coluna.Trim());
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[2].UsedRange.Columns.Count; k++)
+                        {
+                            string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[2].Cells[1, k].Value2.ToString());
                             colunas.Add(coluna);
                             colunasCreate.Add(coluna.Trim());
                             listBox2.Items.Add(coluna.Trim());
                         }
                     }
                 }
-                else
-                {
-                    for (int k = 1; k <= MyApp.Workbooks[2].Worksheets[2].UsedRange.Columns.Count; k++)
-                    {
-                        string coluna = Convert.ToString(MyApp.Workbooks[2].Worksheets[2].Cells[1, k].Value2.ToString());
-                        colunas.Add(coluna);
-                        colunasCreate.Add(coluna.Trim());
-                        listBox2.Items.Add(coluna.Trim());
-                    }
-                }
+                //MyApp.Quit();
+                //MyApp.Workbooks.Close();
+                Marshal.ReleaseComObject(MyApp.Workbooks);
+                Marshal.ReleaseComObject(MyApp);
+                adicionado = true;
             }
-            //MyApp.Quit();
-            //MyApp.Workbooks.Close();
-            Marshal.ReleaseComObject(MyApp.Workbooks);
-            Marshal.ReleaseComObject(MyApp);
+
         }
 
         private void button3_Click_1(object sender, EventArgs e)
@@ -517,81 +547,24 @@ namespace TesteImportaExcel
                     while (reader.Read())
                     {
                         listacolumnas.Add(reader.GetString(0));
-                        listBox2.Items.Add(reader.GetString(0));
+                        if (adicionado == false)
+                        {
+                            listBox2.Items.Add(reader.GetString(0));
+                           
+                        }
 
                     }
+                    adicionado = true;
                 }
             }
         }
 
         private void buttonLimpar_Click(object sender, EventArgs e)
         {
-            SqlConnection conn = new SqlConnection("Data Source=BRCAENRODRIGUES\\SQLEXPRESS;Initial Catalog=test;Integrated Security=True");
-            conn.Open();
-            SqlTransaction transaction = conn.BeginTransaction();
-
-            foreach (string element in filesAdionado)
-
-            {
-                //  MessageBox.Show(myStream.ToString());
-
-                using (StreamReader sr = new StreamReader(@directoryPath + "\\" + element))
-                {
-                    DataTable dataTable = new DataTable();
-
-                    string linha = "";
-                    int lin = 0;
-
-                    linha = sr.ReadLine();
-                    string[] cab = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
-
-                    for (int i = 0; i < cab.Length; i++)
-                    {
-                        dataTable.Columns.Add(cab[i].Trim('"'));
-                    }
-
-                    while (!sr.EndOfStream)
-                    {
-                        linha = sr.ReadLine();
-                        try
-                        {
-                            string[] campos = linha.Split(new String[] { "\",\"", ",\"", ";" }, StringSplitOptions.RemoveEmptyEntries);
-
-                            DataRow row = dataTable.NewRow();
-
-                            for (int i = 0; i < campos.Length; i++)
-                            {
-                                row[i] = campos[i].Trim('"');
-                            }
-
-                            dataTable.Rows.Add(row);
-
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(ex.Message);
-                        }
-
-                    }
-
-                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn))
-                    {
-                        bulkCopy.DestinationTableName = "dbo.tabela";
-
-                        try
-                        {
-                            bulkCopy.WriteToServer(dataTable);
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                    }
-                    dataGridView1.DataSource = dataTable;
-                }
-            }
-                  conn.Close();
-
+            listBox2.Items.Clear();
+            adicionado = false;
         }
-    }
+              
+     }
 }
+      

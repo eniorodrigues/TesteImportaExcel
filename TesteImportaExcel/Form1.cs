@@ -530,10 +530,12 @@ namespace TesteImportaExcel
             conn.Open();
             SqlTransaction transaction = conn.BeginTransaction();
 
-           // foreach (string element in filesAdionado)
+            foreach (string element in filesAdionado)
 
-           // {
-                using (StreamReader sr = new StreamReader("C:\\Bases\\COR DOF 012017.csv"))
+            {
+                //  MessageBox.Show(myStream.ToString());
+
+                using (StreamReader sr = new StreamReader(@directoryPath + "\\" + element))
                 {
                     DataTable dataTable = new DataTable();
 
@@ -572,21 +574,22 @@ namespace TesteImportaExcel
 
                     }
 
-                using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn))
-                {
-                    bulkCopy.DestinationTableName = "dbo.tabela";
+                    using (SqlBulkCopy bulkCopy = new SqlBulkCopy(conn))
+                    {
+                        bulkCopy.DestinationTableName = "dbo.tabela";
 
-                    try
-                    {
-                        bulkCopy.WriteToServer(dataTable);
+                        try
+                        {
+                            bulkCopy.WriteToServer(dataTable);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    dataGridView1.DataSource = dataTable;
                 }
-                dataGridView1.DataSource = dataTable;
-                }
+            }
                   conn.Close();
 
         }

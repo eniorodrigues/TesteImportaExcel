@@ -13,7 +13,7 @@ using System.IO;
 using System.Data.Sql;
 using Microsoft.VisualBasic.FileIO;
 using System.Runtime.InteropServices;
-using LumenWorks.Framework.IO.Csv;
+using Microsoft.Win32;
 
 namespace TesteImportaExcel
 {
@@ -234,7 +234,6 @@ namespace TesteImportaExcel
                             cn.Close();
                         }
 
-                        dataGridView1.DataSource = dataTable;
                     }
 
                 }
@@ -497,21 +496,37 @@ namespace TesteImportaExcel
 
         private void comboBoxConexao_Enter(object sender, EventArgs e)
         {
+            //comboBoxConexao.Items.Clear();
+            //string myServer = Environment.MachineName;
+
+            //DataTable servers = SqlDataSourceEnumerator.Instance.GetDataSources();
+            //for (int i = 0; i < servers.Rows.Count; i++)
+            //{
+            //    if (myServer == servers.Rows[i]["ServerName"].ToString())
+            //    {
+            //        if ((servers.Rows[i]["InstanceName"] as string) != null)
+            //            comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"] + "\\" + servers.Rows[i]["InstanceName"]);
+            //        else
+            //            comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"]);
+            //    }
+            //}
             comboBoxConexao.Items.Clear();
             string myServer = Environment.MachineName;
 
-            DataTable servers = SqlDataSourceEnumerator.Instance.GetDataSources();
-            for (int i = 0; i < servers.Rows.Count; i++)
+            comboBoxConexao.Items.Add(myServer);
+            string ServerName = Environment.MachineName;
+            RegistryView registryView = Environment.Is64BitOperatingSystem ? RegistryView.Registry64 : RegistryView.Registry32;
+            using (RegistryKey hklm = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView))
             {
-                if (myServer == servers.Rows[i]["ServerName"].ToString())
+                RegistryKey instanceKey = hklm.OpenSubKey(@"SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL", false);
+                if (instanceKey != null)
                 {
-                    if ((servers.Rows[i]["InstanceName"] as string) != null)
-                        comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"] + "\\" + servers.Rows[i]["InstanceName"]);
-                    else
-                        comboBoxConexao.Items.Add(servers.Rows[i]["ServerName"]);
+                    foreach (var instanceName in instanceKey.GetValueNames())
+                    {
+                        comboBoxConexao.Items.Add(ServerName + "\\" + instanceName);
+                    }
                 }
             }
-
         }
 
         private void comboBoxBase_SelectedIndexChanged(object sender, EventArgs e)
@@ -522,19 +537,18 @@ namespace TesteImportaExcel
             {
                 con.Open();
                 DataTable t = con.GetSchema("Tables");
-                comboBoxTabela.Items.Clear();
+
                 foreach (DataRow ta in t.Rows)
                 {
 
                     String datatableName = ta.Field<String>("table_name");
-                    comboBoxTabela.Items.Add(datatableName);
+
                 }
             }
         }
 
         private void comboBoxTabela_SelectedIndexChanged(object sender, EventArgs e)
         {
-            tabela = comboBoxTabela.SelectedItem.ToString();
 
             List<string> listacolumnas = new List<string>();
             using (SqlConnection connection = new SqlConnection("Data Source=" + conexao + " ;Initial Catalog=" + baseDeDados + " ;Integrated Security=True"))
